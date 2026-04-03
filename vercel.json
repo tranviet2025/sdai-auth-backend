@@ -1,21 +1,4 @@
 {
   "version": 2,
-  "name": "sdai-auth",
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    }
-  ],
-  "env": {
-    "MONGODB_URI": "@mongodb_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "ADMIN_SECRET": "@admin_secret"
-  }
+  "name": "sdai-auth"
 }

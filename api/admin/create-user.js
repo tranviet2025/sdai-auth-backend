@@ -5,7 +5,7 @@
 // Dùng để tạo user mới qua admin
 // ============================================================
 
-const { connectToDatabase, JWT_SECRET, jwt, bcrypt } = require('../lib/db');
+const { connectToDatabase, JWT_SECRET, jwt, bcrypt } = require('../../lib/db');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
