@@ -17,7 +17,7 @@ const corsHeaders = {
 module.exports = async (req, res) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return res.status(200).setHeaders(corsHeaders).end();
+    return res.status(200).set(corsHeaders).end();
   }
 
   // Only allow POST
@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
     const { username, password, mac } = req.body;
 
     if (!username || !password) {
-      return res.status(400).setHeaders(corsHeaders).json({
+      return res.status(400).set(corsHeaders).json({
         success: false,
         message: 'Vui lòng nhập tên đăng nhập và mật khẩu / Please enter username and password',
       });
@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
     const user = await usersCollection.findOne({ username: username.toLowerCase().trim() });
 
     if (!user) {
-      return res.status(401).setHeaders(corsHeaders).json({
+      return res.status(401).set(corsHeaders).json({
         success: false,
         message: 'Tên đăng nhập không tồn tại / Username not found',
       });
@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
 
     // Check if account is active
     if (!user.isActive) {
-      return res.status(403).setHeaders(corsHeaders).json({
+      return res.status(403).set(corsHeaders).json({
         success: false,
         message: 'Tài khoản đã bị vô hiệu hóa / Account has been disabled',
       });
@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
 
     // Check expiry
     if (user.expiresAt && new Date() > new Date(user.expiresAt)) {
-      return res.status(403).setHeaders(corsHeaders).json({
+      return res.status(403).set(corsHeaders).json({
         success: false,
         message: 'Tài khoản đã hết hạn / Account has expired',
       });
@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
-      return res.status(401).setHeaders(corsHeaders).json({
+      return res.status(401).set(corsHeaders).json({
         success: false,
         message: 'Mật khẩu không đúng / Incorrect password',
       });
@@ -92,7 +92,7 @@ module.exports = async (req, res) => {
       }
     );
 
-    return res.status(200).setHeaders(corsHeaders).json({
+    return res.status(200).set(corsHeaders).json({
       success: true,
       token: token,
       message: 'Đăng nhập thành công / Login successful',
@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).setHeaders(corsHeaders).json({
+    return res.status(500).set(corsHeaders).json({
       success: false,
       message: 'Lỗi server / Server error: ' + error.message,
     });

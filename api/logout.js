@@ -15,7 +15,7 @@ const corsHeaders = {
 
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
-    return res.status(200).setHeaders(corsHeaders).end();
+    return res.status(200).set(corsHeaders).end();
   }
 
   if (req.method !== 'POST') {
@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
 
   // Logout is always success even if token is invalid
   // The client will clear localStorage on its own
-  return res.status(200).setHeaders(corsHeaders).json({
+  return res.status(200).set(corsHeaders).json({
     success: true,
     message: 'Đăng xuất thành công / Logout successful',
   });

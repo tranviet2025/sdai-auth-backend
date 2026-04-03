@@ -16,7 +16,7 @@ const corsHeaders = {
 
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
-    return res.status(200).setHeaders(corsHeaders).end();
+    return res.status(200).set(corsHeaders).end();
   }
 
   if (req.method !== 'POST') {
@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).setHeaders(corsHeaders).json({
+      return res.status(401).set(corsHeaders).json({
         success: false,
         message: 'Chưa đăng nhập / Not authenticated',
       });
@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
     try {
       decoded = jwt.verify(token, JWT_SECRET);
     } catch (jwtError) {
-      return res.status(401).setHeaders(corsHeaders).json({
+      return res.status(401).set(corsHeaders).json({
         success: false,
         message: 'Phiên đã hết hạn, vui lòng đăng nhập lại / Session expired, please login again',
       });
@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
     });
 
     if (!user || !user.isActive) {
-      return res.status(403).setHeaders(corsHeaders).json({
+      return res.status(403).set(corsHeaders).json({
         success: false,
         message: 'Tài khoản không hợp lệ / Invalid account',
       });
@@ -64,13 +64,13 @@ module.exports = async (req, res) => {
 
     // Check expiry
     if (user.expiresAt && new Date() > new Date(user.expiresAt)) {
-      return res.status(403).setHeaders(corsHeaders).json({
+      return res.status(403).set(corsHeaders).json({
         success: false,
         message: 'Tài khoản đã hết hạn / Account has expired',
       });
     }
 
-    return res.status(200).setHeaders(corsHeaders).json({
+    return res.status(200).set(corsHeaders).json({
       success: true,
       user: {
         username: user.username,
@@ -79,7 +79,7 @@ module.exports = async (req, res) => {
     });
   } catch (error) {
     console.error('Verify error:', error);
-    return res.status(500).setHeaders(corsHeaders).json({
+    return res.status(500).set(corsHeaders).json({
       success: false,
       message: 'Lỗi server / Server error: ' + error.message,
     });

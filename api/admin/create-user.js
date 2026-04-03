@@ -18,7 +18,7 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET || 'admin-secret-change-this';
 
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
-    return res.status(200).setHeaders(corsHeaders).end();
+    return res.status(200).set(corsHeaders).end();
   }
 
   if (req.method !== 'POST') {
@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
     // Verify admin secret
     const authHeader = req.headers.authorization;
     if (!authHeader || authHeader !== `Bearer ${ADMIN_SECRET}`) {
-      return res.status(401).setHeaders(corsHeaders).json({
+      return res.status(401).set(corsHeaders).json({
         success: false,
         message: 'Unauthorized',
       });
@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
     const { username, password, expiresAt, note } = req.body;
 
     if (!username || !password) {
-      return res.status(400).setHeaders(corsHeaders).json({
+      return res.status(400).set(corsHeaders).json({
         success: false,
         message: 'Username and password are required',
       });
@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
     // Check if user already exists
     const existing = await usersCollection.findOne({ username: username.toLowerCase().trim() });
     if (existing) {
-      return res.status(400).setHeaders(corsHeaders).json({
+      return res.status(400).set(corsHeaders).json({
         success: false,
         message: 'Username already exists',
       });
@@ -76,7 +76,7 @@ module.exports = async (req, res) => {
 
     const result = await usersCollection.insertOne(newUser);
 
-    return res.status(201).setHeaders(corsHeaders).json({
+    return res.status(201).set(corsHeaders).json({
       success: true,
       message: 'User created successfully',
       userId: result.insertedId.toString(),
@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
     });
   } catch (error) {
     console.error('Create user error:', error);
-    return res.status(500).setHeaders(corsHeaders).json({
+    return res.status(500).set(corsHeaders).json({
       success: false,
       message: 'Server error: ' + error.message,
     });

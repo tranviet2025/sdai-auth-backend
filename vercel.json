@@ -1,4 +1,20 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "name": "sdai-auth"
+=======
+  "name": "sdai-auth",
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ]
+>>>>>>> e2c59f3fb82551f5ddc7576624b4948a3ec290d9
 }
