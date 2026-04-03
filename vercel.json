@@ -12,10 +12,5 @@
       "src": "/api/(.*)",
       "dest": "/api/$1"
     }
-  ],
-  "env": {
-    "MONGODB_URI": "@mongodb_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "ADMIN_SECRET": "@admin_secret"
-  }
+  ]
 }
