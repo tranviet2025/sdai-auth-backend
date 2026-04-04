@@ -1,1 +1,7 @@
-{\n  "version": 2,\n  "builds": [\n    { "src": "api/**/*.js", "use": "@vercel/node" }\n  ]\n}
+{
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node"
+    }
+  }
+}
