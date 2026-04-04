@@ -1,11 +1,12 @@
 // ============================================================
 // POST /api/admin/create-user
-// Headers: { Authorization: Bearer <admin-token> }
-// Body: { username, password, expiresAt (optional) }
+// Headers: { Authorization: Bearer <ADMIN_SECRET> }
+// Body: { username, password, expiresAt (optional), note (optional) }
 // Dùng để tạo user mới qua admin
 // ============================================================
 
-const { connectToDatabase, JWT_SECRET, jwt, bcrypt } = require('../../lib/db');
+const bcrypt = require('bcryptjs');
+const { connectToDatabase } = require('../../lib/db');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,11 +15,17 @@ const corsHeaders = {
   'Content-Type': 'application/json',
 };
 
+function setHeaders(res) {
+  Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+}
+
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'admin-secret-change-this';
 
 module.exports = async (req, res) => {
+  setHeaders(res);
+
   if (req.method === 'OPTIONS') {
-    return res.status(200).set(corsHeaders).end();
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
@@ -29,16 +36,16 @@ module.exports = async (req, res) => {
     // Verify admin secret
     const authHeader = req.headers.authorization;
     if (!authHeader || authHeader !== `Bearer ${ADMIN_SECRET}`) {
-      return res.status(401).set(corsHeaders).json({
+      return res.status(401).json({
         success: false,
-        message: 'Unauthorized',
+        message: 'Unauthorized - Invalid admin secret',
       });
     }
 
-    const { username, password, expiresAt, note } = req.body;
+    const { username, password, expiresAt, note } = req.body || {};
 
     if (!username || !password) {
-      return res.status(400).set(corsHeaders).json({
+      return res.status(400).json({
         success: false,
         message: 'Username and password are required',
       });
@@ -51,17 +58,16 @@ module.exports = async (req, res) => {
     // Check if user already exists
     const existing = await usersCollection.findOne({ username: username.toLowerCase().trim() });
     if (existing) {
-      return res.status(400).set(corsHeaders).json({
+      return res.status(400).json({
         success: false,
-        message: 'Username already exists',
+        message: `Username '${username}' already exists`,
       });
     }
 
     // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
+    const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user document
     const newUser = {
       username: username.toLowerCase().trim(),
       passwordHash,
@@ -76,7 +82,7 @@ module.exports = async (req, res) => {
 
     const result = await usersCollection.insertOne(newUser);
 
-    return res.status(201).set(corsHeaders).json({
+    return res.status(201).json({
       success: true,
       message: 'User created successfully',
       userId: result.insertedId.toString(),
@@ -85,7 +91,7 @@ module.exports = async (req, res) => {
     });
   } catch (error) {
     console.error('Create user error:', error);
-    return res.status(500).set(corsHeaders).json({
+    return res.status(500).json({
       success: false,
       message: 'Server error: ' + error.message,
     });
